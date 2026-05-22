@@ -10,6 +10,8 @@ A prototype workbench for planning, visualizing, and executing AI-agent workflow
 
 It shows a complete agentic-system shape: a React frontend, FastAPI orchestrator, FastMCP tool server, logging service, local Docker Compose workflow, and Azure deployment path.
 
+![MCP Orchestrator demo](docs/images/mcp-orchestrator-demo.gif)
+
 ## What it demonstrates
 
 | Area | What it shows |
