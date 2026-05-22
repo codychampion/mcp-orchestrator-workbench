@@ -1,0 +1,89 @@
+# MCP Tool Configuration - translate_tool
+# This config is optimized by DSPy to improve parameter handling and error recovery
+
+tool:
+  name: translate_tool
+  description: Translate text between languages
+  version: 1.0
+  category: text_processing
+
+parameters:
+  schema:
+    text:
+      type: string
+      required: true
+      description: Text to translate
+    target_language:
+      type: string
+      required: true
+      description: Target language (e.g., 'spanish', 'french', 'german')
+    source_language:
+      type: string
+      required: false
+      default: auto_detect
+      description: Source language (auto-detected if not specified)
+
+  # DSPy learns these parameter name mappings
+  name_mappings:
+    sentence: text
+    content: text
+    message: text
+    input: text
+    string: text
+    lang: target_language
+    to_language: target_language
+    target_lang: target_language
+    language: target_language
+    from_language: source_language
+    source_lang: source_language
+
+  smart_defaults:
+    source_language:
+      strategy: auto_detect
+      fallback: auto_detect
+    target_language:
+      strategy: infer_from_context
+      fallback: null
+
+examples:
+  - description: Simple translation with abbreviated param names
+    input:
+      raw_params: {sentence: "Hello", lang: "es"}
+      context: []
+    expected_output:
+      text: "Hello"
+      target_language: spanish
+      source_language: auto_detect
+
+  - description: Full language names
+    input:
+      raw_params: {content: "Bonjour", to_language: "english"}
+      context: []
+    expected_output:
+      text: "Bonjour"
+      target_language: english
+      source_language: auto_detect
+
+error_recovery:
+  strategies:
+    - error_pattern: "Missing required parameter 'text'"
+      recovery_action: extract_from_context
+      context_hints: ["message", "text to translate", "content"]
+
+    - error_pattern: "Invalid language code"
+      recovery_action: normalize_language
+      normalization_map:
+        es: spanish
+        fr: french
+        de: german
+        en: english
+        zh: chinese
+        ja: japanese
+
+optimization:
+  last_optimized: null
+  optimization_count: 0
+  accuracy_metrics:
+    parameter_correction_rate: 0.0
+    error_recovery_rate: 0.0
+  learned_patterns: []

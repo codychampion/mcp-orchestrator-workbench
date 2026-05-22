@@ -1,0 +1,46 @@
+# Local Claude settings
+.claude/settings.local.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.local.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+!frontend/.env.local.example
+orchestrator-service/.env
+mcp-server/.env
+logging-service/.env
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Node / frontend
+node_modules/
+dist/
+build/
+coverage/
+.npm/
+
+# Logs and local databases
+*.log
+*.sqlite
+*.sqlite3
+*.db
+logging-service/data/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Docker / local runtime
+.docker/

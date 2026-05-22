@@ -1,0 +1,99 @@
+# MCP Tool Configuration - weather_tool
+# This config is optimized by DSPy to improve parameter handling and error recovery
+
+tool:
+  name: weather_tool
+  description: Get current weather information for a location
+  version: 1.0
+  category: data_retrieval
+
+# Parameter schema and mappings (DSPy optimized)
+parameters:
+  schema:
+    location:
+      type: string
+      required: true
+      description: City name or location to get weather for
+    units:
+      type: string
+      required: false
+      default: celsius
+      enum: [celsius, fahrenheit, kelvin]
+      description: Temperature units to use
+
+  # DSPy learns these parameter name mappings from failures
+  name_mappings:
+    place: location
+    city: location
+    address: location
+    where: location
+    loc: location
+    temp_units: units
+    temperature_units: units
+    unit: units
+
+  # DSPy learns to generate these missing values from context
+  smart_defaults:
+    units:
+      strategy: infer_from_location
+      rules:
+        - pattern: "US|USA|United States"
+          value: fahrenheit
+        - pattern: ".*"
+          value: celsius
+    location:
+      strategy: extract_from_context
+      fallback: null
+
+# Usage examples (training data for DSPy)
+examples:
+  - description: Basic weather query
+    input:
+      raw_params: {place: "New York"}
+      context: ["User asked for weather in New York"]
+    expected_output:
+      location: "New York"
+      units: celsius
+
+  - description: US location with temperature units
+    input:
+      raw_params: {city: "Los Angeles", temp_units: "fahrenheit"}
+      context: []
+    expected_output:
+      location: "Los Angeles"
+      units: fahrenheit
+
+  - description: Missing location recovery
+    input:
+      raw_params: {units: "celsius"}
+      context: ["User previously mentioned Paris", "Looking for weather"]
+    expected_output:
+      location: "Paris"
+      units: celsius
+
+# Error recovery rules (DSPy optimized)
+error_recovery:
+  strategies:
+    - error_pattern: "Missing required parameter 'location'"
+      recovery_action: extract_from_context
+      context_hints: ["city name", "location", "place", "where"]
+      confidence_threshold: 0.7
+
+    - error_pattern: "Invalid units"
+      recovery_action: use_default
+      default_value: celsius
+
+    - error_pattern: "Location not found"
+      recovery_action: suggest_alternatives
+      suggestion_strategy: fuzzy_match
+
+# DSPy optimization metadata
+optimization:
+  last_optimized: null
+  optimization_count: 0
+  accuracy_metrics:
+    parameter_correction_rate: 0.0
+    error_recovery_rate: 0.0
+    successful_calls: 0
+    failed_calls: 0
+  learned_patterns: []

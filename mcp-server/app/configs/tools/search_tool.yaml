@@ -1,0 +1,54 @@
+# Search Tool Configuration
+# Searches for information on a topic
+
+tool:
+  name: search_tool
+  description: Search for information on a topic (returns mock search results)
+  version: 1.0
+  category: data_retrieval
+
+parameters:
+  schema:
+    query:
+      type: string
+      required: true
+      description: Search query
+    num_results:
+      type: number
+      required: false
+      default: 3
+      description: Number of results to return
+
+  name_mappings:
+    q: query
+    search: query
+    term: query
+    keyword: query
+    results: num_results
+    count: num_results
+    limit: num_results
+
+  smart_defaults:
+    num_results:
+      strategy: use_default
+      rules: []
+      fallback: 3
+
+examples: []
+
+error_recovery:
+  strategies:
+    - error_pattern: "missing.*query"
+      recovery_action: extract_from_context
+      context_hints: ["Extract search terms from user message"]
+      confidence_threshold: 0.8
+
+optimization:
+  last_optimized: null
+  optimization_count: 0
+  accuracy_metrics:
+    parameter_correction_rate: 0.0
+    error_recovery_rate: 0.0
+    successful_calls: 0
+    failed_calls: 0
+  learned_patterns: []

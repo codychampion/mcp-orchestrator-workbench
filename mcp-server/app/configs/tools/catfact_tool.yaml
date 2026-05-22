@@ -1,0 +1,32 @@
+# Cat Fact Tool Configuration
+# Returns random cat facts from the internet
+
+tool:
+  name: cat_fact
+  description: Return a random cat fact from the internet
+  version: 1.0
+  category: data_retrieval
+
+parameters:
+  schema: {}
+  name_mappings: {}
+  smart_defaults: {}
+
+examples: []
+
+error_recovery:
+  strategies:
+    - error_pattern: ".*network.*"
+      recovery_action: suggest_alternatives
+      context_hints: ["Check internet connection"]
+      confidence_threshold: 0.7
+
+optimization:
+  last_optimized: null
+  optimization_count: 0
+  accuracy_metrics:
+    parameter_correction_rate: 0.0
+    error_recovery_rate: 0.0
+    successful_calls: 0
+    failed_calls: 0
+  learned_patterns: []

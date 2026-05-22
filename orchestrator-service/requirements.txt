@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+httpx
+pydantic
+networkx
+python-dotenv
+requests
+fastmcp
+azure-ai-inference
+dspy-ai
+pyyaml

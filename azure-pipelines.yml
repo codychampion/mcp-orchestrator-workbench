@@ -1,0 +1,203 @@
+# Azure DevOps Pipeline for MCP Orchestrator
+# Builds, tests, and deploys to Azure Container Apps
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - frontend/*
+      - orchestrator-service/*
+      - mcp-server/*
+      - infrastructure/*
+
+pr:
+  branches:
+    include:
+      - main
+      - develop
+
+variables:
+  - group: mcp-orchestrator-secrets  # Variable group containing secrets
+  - name: dockerRegistryServiceConnection
+    value: 'mcp-orchestrator-acr'
+  - name: imageRepository
+    value: 'mcp-orchestrator'
+  - name: containerRegistry
+    value: '$(ACR_NAME).azurecr.io'
+  - name: dockerfilePath
+    value: '$(Build.SourcesDirectory)'
+  - name: tag
+    value: '$(Build.BuildId)'
+  - name: vmImageName
+    value: 'ubuntu-latest'
+
+stages:
+  - stage: Build
+    displayName: Build and Push Images
+    jobs:
+      - job: BuildFrontend
+        displayName: Build Frontend
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: Docker@2
+            displayName: Build and push frontend image
+            inputs:
+              command: buildAndPush
+              repository: frontend
+              dockerfile: $(dockerfilePath)/frontend/Dockerfile
+              containerRegistry: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
+                latest
+
+      - job: BuildOrchestrator
+        displayName: Build Orchestrator
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: Docker@2
+            displayName: Build and push orchestrator image
+            inputs:
+              command: buildAndPush
+              repository: orchestrator
+              dockerfile: $(dockerfilePath)/orchestrator-service/Dockerfile
+              containerRegistry: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
+                latest
+
+      - job: BuildMCPServer
+        displayName: Build MCP Server
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: Docker@2
+            displayName: Build and push MCP server image
+            inputs:
+              command: buildAndPush
+              repository: mcp-server
+              dockerfile: $(dockerfilePath)/mcp-server/Dockerfile
+              containerRegistry: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
+                latest
+
+  - stage: DeployDev
+    displayName: Deploy to Dev
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    jobs:
+      - deployment: DeployInfrastructure
+        displayName: Deploy Infrastructure
+        pool:
+          vmImage: $(vmImageName)
+        environment: 'mcp-orchestrator-dev'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: AzureCLI@2
+                  displayName: 'Deploy Infrastructure'
+                  inputs:
+                    azureSubscription: 'Azure-Service-Connection'
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      az deployment group create \
+                        --resource-group $(RESOURCE_GROUP_DEV) \
+                        --template-file infrastructure/main.bicep \
+                        --parameters \
+                          environment=dev \
+                          enableAuth=true \
+                          clientId=$(AZURE_CLIENT_ID) \
+                          clientSecret=$(AZURE_CLIENT_SECRET) \
+                          githubToken=$(GITHUB_TOKEN)
+
+                - task: AzureCLI@2
+                  displayName: 'Update Container Apps'
+                  inputs:
+                    azureSubscription: 'Azure-Service-Connection'
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      # Update frontend
+                      az containerapp update \
+                        --name mcp-orchestrator-frontend-dev \
+                        --resource-group $(RESOURCE_GROUP_DEV) \
+                        --image $(containerRegistry)/frontend:$(tag)
+
+                      # Update orchestrator
+                      az containerapp update \
+                        --name mcp-orchestrator-orchestrator-dev \
+                        --resource-group $(RESOURCE_GROUP_DEV) \
+                        --image $(containerRegistry)/orchestrator:$(tag)
+
+                      # Update MCP server
+                      az containerapp update \
+                        --name mcp-orchestrator-mcp-server-dev \
+                        --resource-group $(RESOURCE_GROUP_DEV) \
+                        --image $(containerRegistry)/mcp-server:$(tag)
+
+  - stage: DeployProd
+    displayName: Deploy to Production
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: DeployInfrastructure
+        displayName: Deploy Infrastructure
+        pool:
+          vmImage: $(vmImageName)
+        environment: 'mcp-orchestrator-prod'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: AzureCLI@2
+                  displayName: 'Deploy Infrastructure'
+                  inputs:
+                    azureSubscription: 'Azure-Service-Connection'
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      az deployment group create \
+                        --resource-group $(RESOURCE_GROUP_PROD) \
+                        --template-file infrastructure/main.bicep \
+                        --parameters \
+                          environment=prod \
+                          enableAuth=true \
+                          clientId=$(AZURE_CLIENT_ID) \
+                          clientSecret=$(AZURE_CLIENT_SECRET) \
+                          githubToken=$(GITHUB_TOKEN)
+
+                - task: AzureCLI@2
+                  displayName: 'Update Container Apps'
+                  inputs:
+                    azureSubscription: 'Azure-Service-Connection'
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      # Update frontend
+                      az containerapp update \
+                        --name mcp-orchestrator-frontend-prod \
+                        --resource-group $(RESOURCE_GROUP_PROD) \
+                        --image $(containerRegistry)/frontend:$(tag)
+
+                      # Update orchestrator
+                      az containerapp update \
+                        --name mcp-orchestrator-orchestrator-prod \
+                        --resource-group $(RESOURCE_GROUP_PROD) \
+                        --image $(containerRegistry)/orchestrator:$(tag)
+
+                      # Update MCP server
+                      az containerapp update \
+                        --name mcp-orchestrator-mcp-server-prod \
+                        --resource-group $(RESOURCE_GROUP_PROD) \
+                        --image $(containerRegistry)/mcp-server:$(tag)

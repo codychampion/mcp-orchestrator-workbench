@@ -1,0 +1,53 @@
+# Save Fact Tool Configuration
+# Saves facts to the knowledge base with optional category
+
+tool:
+  name: save_fact
+  description: Save a fact to the knowledge base with an optional category
+  version: 1.0
+  category: data_storage
+
+parameters:
+  schema:
+    fact_text:
+      type: string
+      required: true
+      description: The fact text to save
+    category:
+      type: string
+      required: false
+      default: "general"
+      description: Category for the fact
+
+  name_mappings:
+    fact: fact_text
+    text: fact_text
+    content: fact_text
+    info: fact_text
+    cat: category
+    type: category
+
+  smart_defaults:
+    category:
+      strategy: infer_from_context
+      rules: []
+      fallback: "general"
+
+examples: []
+
+error_recovery:
+  strategies:
+    - error_pattern: "missing.*fact"
+      recovery_action: extract_from_context
+      context_hints: ["Extract fact from user message"]
+      confidence_threshold: 0.7
+
+optimization:
+  last_optimized: null
+  optimization_count: 0
+  accuracy_metrics:
+    parameter_correction_rate: 0.0
+    error_recovery_rate: 0.0
+    successful_calls: 0
+    failed_calls: 0
+  learned_patterns: []

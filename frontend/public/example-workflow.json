@@ -1,0 +1,62 @@
+{
+  "workflow_id": "example-cat-facts-workflow",
+  "nodes": [
+    {
+      "id": "node1",
+      "type": "tool",
+      "config": {
+        "tool": "cat_fact",
+        "params": {}
+      }
+    },
+    {
+      "id": "node2",
+      "type": "tool",
+      "config": {
+        "tool": "echo",
+        "params": {
+          "text": "Cat fact received, now summarizing..."
+        }
+      }
+    },
+    {
+      "id": "node3",
+      "type": "tool",
+      "config": {
+        "tool": "summarize",
+        "params": {
+          "text": "This will be auto-filled from node1's output using LLM transformation"
+        }
+      }
+    },
+    {
+      "id": "node4",
+      "type": "tool",
+      "config": {
+        "tool": "save_fact",
+        "params": {
+          "fact": "This will be auto-filled from node3's output using LLM transformation"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "node1",
+      "to": "node2"
+    },
+    {
+      "from": "node1",
+      "to": "node3"
+    },
+    {
+      "from": "node3",
+      "to": "node4"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-15T10:00:00Z",
+    "description": "Example workflow that gets a cat fact, echoes a message, summarizes it, and saves the result. Demonstrates tool chaining with LLM-powered parameter transformation.",
+    "version": "1.0"
+  }
+}

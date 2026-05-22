@@ -1,0 +1,51 @@
+# Calculate Tool Configuration
+# Evaluates mathematical expressions safely
+
+tool:
+  name: calculate_tool
+  description: Evaluate a mathematical expression safely
+  version: 1.0
+  category: computation
+
+parameters:
+  schema:
+    expression:
+      type: string
+      required: true
+      description: Mathematical expression to evaluate
+
+  name_mappings:
+    expr: expression
+    formula: expression
+    equation: expression
+    math: expression
+    calculation: expression
+
+  smart_defaults:
+    expression:
+      strategy: infer_from_context
+      rules: []
+      fallback: "1+1"
+
+examples: []
+
+error_recovery:
+  strategies:
+    - error_pattern: "invalid.*syntax"
+      recovery_action: suggest_alternatives
+      context_hints: ["Check expression syntax"]
+      confidence_threshold: 0.8
+    - error_pattern: "division.*zero"
+      recovery_action: use_default
+      context_hints: []
+      confidence_threshold: 0.9
+
+optimization:
+  last_optimized: null
+  optimization_count: 0
+  accuracy_metrics:
+    parameter_correction_rate: 0.0
+    error_recovery_rate: 0.0
+    successful_calls: 0
+    failed_calls: 0
+  learned_patterns: []

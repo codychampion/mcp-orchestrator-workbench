@@ -1,0 +1,57 @@
+# Format JSON Tool Configuration
+# Formats and validates JSON data
+
+tool:
+  name: format_json_tool
+  description: Format and validate JSON data
+  version: 1.0
+  category: text_processing
+
+parameters:
+  schema:
+    data:
+      type: string
+      required: true
+      description: JSON data to format
+    indent:
+      type: number
+      required: false
+      default: 2
+      description: Indentation spaces
+
+  name_mappings:
+    json: data
+    input: data
+    content: data
+    text: data
+    spaces: indent
+    indentation: indent
+
+  smart_defaults:
+    indent:
+      strategy: use_default
+      rules: []
+      fallback: 2
+
+examples: []
+
+error_recovery:
+  strategies:
+    - error_pattern: "invalid.*json"
+      recovery_action: suggest_alternatives
+      context_hints: ["Check JSON syntax"]
+      confidence_threshold: 0.8
+    - error_pattern: "missing.*data"
+      recovery_action: extract_from_context
+      context_hints: ["Extract JSON from user message"]
+      confidence_threshold: 0.7
+
+optimization:
+  last_optimized: null
+  optimization_count: 0
+  accuracy_metrics:
+    parameter_correction_rate: 0.0
+    error_recovery_rate: 0.0
+    successful_calls: 0
+    failed_calls: 0
+  learned_patterns: []

@@ -1,0 +1,56 @@
+# MCP Tool Configuration Template
+# Copy this file and customize for each MCP tool
+# DSPy will optimize the mappings, defaults, and recovery strategies
+
+tool:
+  name: tool_name_here
+  description: Tool description
+  version: 1.0
+  category: data_retrieval | text_processing | file_operations | computation
+
+parameters:
+  schema:
+    # Define expected parameters with JSON schema format
+    param_name:
+      type: string | number | boolean | object | array
+      required: true | false
+      default: default_value
+      description: Parameter description
+
+  # DSPy learns parameter name variations and corrections
+  name_mappings:
+    common_typo: correct_param_name
+    alternative_name: correct_param_name
+
+  # DSPy learns intelligent default generation
+  smart_defaults:
+    param_name:
+      strategy: infer_from_context | use_previous | calculate
+      rules: []
+      fallback: null
+
+examples:
+  # Training examples for DSPy optimization
+  - description: Example scenario
+    input:
+      raw_params: {incorrect_name: "value"}
+      context: ["contextual information"]
+    expected_output:
+      correct_name: "value"
+
+error_recovery:
+  strategies:
+    - error_pattern: "Error message pattern"
+      recovery_action: extract_from_context | use_default | suggest_alternatives
+      context_hints: []
+      confidence_threshold: 0.7
+
+optimization:
+  last_optimized: null
+  optimization_count: 0
+  accuracy_metrics:
+    parameter_correction_rate: 0.0
+    error_recovery_rate: 0.0
+    successful_calls: 0
+    failed_calls: 0
+  learned_patterns: []

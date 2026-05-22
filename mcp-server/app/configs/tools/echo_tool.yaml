@@ -1,0 +1,46 @@
+# Echo Tool Configuration
+# Echoes text back to the user
+
+tool:
+  name: echo
+  description: Echo the provided text back to the user
+  version: 1.0
+  category: text_processing
+
+parameters:
+  schema:
+    text:
+      type: string
+      required: true
+      description: Text to echo back
+
+  name_mappings:
+    message: text
+    msg: text
+    input: text
+    content: text
+
+  smart_defaults:
+    text:
+      strategy: use_previous
+      rules: []
+      fallback: "Hello!"
+
+examples: []
+
+error_recovery:
+  strategies:
+    - error_pattern: "missing.*text"
+      recovery_action: use_default
+      context_hints: []
+      confidence_threshold: 0.8
+
+optimization:
+  last_optimized: null
+  optimization_count: 0
+  accuracy_metrics:
+    parameter_correction_rate: 0.0
+    error_recovery_rate: 0.0
+    successful_calls: 0
+    failed_calls: 0
+  learned_patterns: []

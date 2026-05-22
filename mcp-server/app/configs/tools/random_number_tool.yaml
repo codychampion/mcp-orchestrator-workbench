@@ -1,0 +1,58 @@
+# Random Number Tool Configuration
+# Generates random integers within a specified range
+
+tool:
+  name: random_number_tool
+  description: Generate a random integer between min_val and max_val
+  version: 1.0
+  category: computation
+
+parameters:
+  schema:
+    min_val:
+      type: number
+      required: false
+      default: 1
+      description: Minimum value (inclusive)
+    max_val:
+      type: number
+      required: false
+      default: 100
+      description: Maximum value (inclusive)
+
+  name_mappings:
+    min: min_val
+    minimum: min_val
+    start: min_val
+    max: max_val
+    maximum: max_val
+    end: max_val
+
+  smart_defaults:
+    min_val:
+      strategy: use_default
+      rules: []
+      fallback: 1
+    max_val:
+      strategy: use_default
+      rules: []
+      fallback: 100
+
+examples: []
+
+error_recovery:
+  strategies:
+    - error_pattern: "min.*greater.*max"
+      recovery_action: suggest_alternatives
+      context_hints: ["Swap min and max values"]
+      confidence_threshold: 0.9
+
+optimization:
+  last_optimized: null
+  optimization_count: 0
+  accuracy_metrics:
+    parameter_correction_rate: 0.0
+    error_recovery_rate: 0.0
+    successful_calls: 0
+    failed_calls: 0
+  learned_patterns: []

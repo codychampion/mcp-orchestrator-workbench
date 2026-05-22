@@ -1,0 +1,52 @@
+services:
+  mcp-server:
+    build: ./mcp-server
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    environment:
+      - FASTMCP_HOST=0.0.0.0
+      - FASTMCP_PORT=8000
+
+  orchestrator:
+    build: ./orchestrator-service
+    ports:
+      - "8100:8100"
+    environment:
+      - MCP_SERVER_URL=http://mcp-server:8000/sse
+      - LLM_PROVIDER=${LLM_PROVIDER:-mock}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - AZURE_AI_FOUNDRY_ENDPOINT=${AZURE_AI_FOUNDRY_ENDPOINT:-}
+      - AZURE_AI_FOUNDRY_KEY=${AZURE_AI_FOUNDRY_KEY:-}
+      - AZURE_AI_FOUNDRY_MODEL=${AZURE_AI_FOUNDRY_MODEL:-gpt-4o-mini}
+      - MAX_CONCURRENT_CALLS=${MAX_CONCURRENT_CALLS:-4}
+      - LOGGING_SERVICE_URL=http://logging-service:8200
+    depends_on:
+      - mcp-server
+      - logging-service
+
+  logging-service:
+    build: ./logging-service
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./logging-service/data:/app/data
+    environment:
+      - LOG_DB_PATH=/app/data/logs.db
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8200/health')"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_BASE=http://localhost:8100
+      - VITE_ORCHESTRATOR_URL=http://localhost:8100
+      - VITE_ORCHESTRATOR_WS_URL=ws://localhost:8100
+    depends_on:
+      - orchestrator

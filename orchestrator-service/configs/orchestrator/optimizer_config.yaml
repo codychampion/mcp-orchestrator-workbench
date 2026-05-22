@@ -1,0 +1,203 @@
+# Orchestrator Optimizer Configuration
+# DSPy optimizes workflow planning, tool selection, and parameter enhancement strategies
+
+orchestrator:
+  name: MCP Orchestrator
+  version: 1.0
+  llm_provider: github_models
+
+# Workflow Planning (DSPy optimized)
+workflow_planning:
+  # DSPy learns better planning strategies
+  planning_strategies:
+    - name: sequential_planning
+      description: Plan tasks in sequential order
+      priority: high
+      prompt_template: |
+        Given the user goal: {goal}
+        Available tools: {tools}
+        Break down into sequential steps.
+
+    - name: parallel_planning
+      description: Identify parallelizable tasks
+      priority: medium
+      prompt_template: |
+        Given the user goal: {goal}
+        Which tasks can be executed in parallel?
+
+  # DSPy learns to decompose complex goals
+  goal_decomposition:
+    max_depth: 3
+    min_steps: 1
+    max_steps: 10
+    learned_patterns:
+      # DSPy adds patterns here as it learns
+      - pattern: "get.*and.*"
+        strategy: parallel
+      - pattern: "first.*then.*"
+        strategy: sequential
+
+# Tool Selection (DSPy optimized)
+tool_selection:
+  # DSPy learns which tools work best for which tasks
+  selection_strategies:
+    - name: semantic_matching
+      weight: 0.6
+      description: Match tool description to task semantics
+
+    - name: historical_success
+      weight: 0.3
+      description: Prefer tools with high success rates
+
+    - name: parameter_compatibility
+      weight: 0.1
+      description: Choose tools with compatible parameters
+
+  # DSPy learns tool preferences for task types
+  task_to_tool_preferences:
+    weather_query:
+      preferred_tools: [weather_tool, search_tool]
+      avoid_tools: []
+      confidence: 0.0
+
+    translation:
+      preferred_tools: [translate_tool]
+      avoid_tools: [echo, print]
+      confidence: 0.0
+
+    file_operations:
+      preferred_tools: [read_file, write_file, list_files]
+      avoid_tools: []
+      confidence: 0.0
+
+  # DSPy learns from tool selection mistakes
+  learned_corrections:
+    # Format: {wrong_tool: {task_pattern: correct_tool}}
+    examples: []
+
+# Parameter Enhancement (DSPy optimized)
+parameter_enhancement:
+  # Global parameter name normalization rules
+  common_mappings:
+    # DSPy learns these from across all tools
+    file: filepath
+    path: filepath
+    fn: filename
+    msg: message
+    txt: text
+    str: string
+    num: number
+    val: value
+
+  # Context extraction strategies
+  context_extraction:
+    max_context_items: 5
+    extraction_prompts:
+      location: "Extract any location, place, or city name from: {context}"
+      time: "Extract any time or date reference from: {context}"
+      entity: "Extract the main entity or subject from: {context}"
+
+  # Missing parameter generation
+  parameter_generation:
+    strategies:
+      - name: context_based
+        enabled: true
+        confidence_threshold: 0.7
+
+      - name: previous_value
+        enabled: true
+        max_history_lookback: 3
+
+      - name: common_defaults
+        enabled: true
+        defaults:
+          units: metric
+          language: english
+          format: json
+
+# Error Recovery (DSPy optimized)
+error_recovery:
+  max_retries: 2
+  retry_delay_seconds: 0
+
+  # DSPy learns error patterns and fixes
+  recovery_strategies:
+    parameter_errors:
+      - error_keywords: [missing, required, expected]
+        recovery_action: enhance_parameters
+        use_llm: true
+
+      - error_keywords: [invalid, incorrect, wrong]
+        recovery_action: correct_parameters
+        use_llm: true
+
+    tool_errors:
+      - error_keywords: [not found, unavailable, failed]
+        recovery_action: select_alternative_tool
+        use_llm: true
+
+      - error_keywords: [timeout, slow]
+        recovery_action: retry_with_timeout
+        use_llm: false
+
+  # DSPy learns successful recovery patterns
+  learned_recoveries:
+    # Format: {error_pattern: {solution_strategy: success_rate}}
+    examples: []
+
+# DSPy Optimization Settings
+dspy_settings:
+  # Training configuration
+  training:
+    batch_size: 10
+    max_bootstrapped_demos: 8
+    max_labeled_demos: 4
+
+  # Optimization metrics
+  metrics:
+    primary_metric: accuracy
+    secondary_metrics:
+      - parameter_correction_rate
+      - error_recovery_rate
+      - tool_selection_accuracy
+      - workflow_completion_rate
+
+  # Model configuration
+  models:
+    planner_model: gpt-4o-mini
+    parameter_enhancer_model: gpt-4o-mini
+    error_recovery_model: gpt-4o-mini
+
+# Optimization Metadata
+optimization:
+  last_full_optimization: null
+  optimization_history:
+    # DSPy tracks optimization runs
+    - timestamp: null
+      type: null
+      improvements: {}
+
+  current_metrics:
+    workflow_planning:
+      success_rate: 0.0
+      avg_steps: 0
+
+    tool_selection:
+      accuracy: 0.0
+      avg_confidence: 0.0
+
+    parameter_enhancement:
+      correction_rate: 0.0
+      generation_rate: 0.0
+
+    error_recovery:
+      recovery_rate: 0.0
+      avg_retries: 0.0
+
+# Learned Prompts (DSPy optimized)
+# DSPy stores optimized prompts here
+learned_prompts:
+  plan_generation: null
+  tool_selection: null
+  parameter_enhancement: null
+  error_recovery: null
