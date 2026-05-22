@@ -34,6 +34,8 @@ Visual workflow creation with connected tools and agents.
 
 ## Architecture
 
+For the deeper system walkthrough, see [`ARCHITECTURE.md`](ARCHITECTURE.md).
+
 ```text
 React frontend
   -> FastAPI orchestrator
